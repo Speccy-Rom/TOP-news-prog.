@@ -1,76 +1,105 @@
-# Написать программу, которая будет выводить топ 10 самых часто встречающихся в новостях слов
-# длиннее 6 символов для каждого файла.
-# Не забываем про декомпозицию и организацию кода в функции.
-# В решении домашнего задания вам могут помочь: split(), sort() или sorted().
-
-from pprint import pprint
+# Написать программу, которая будет выводить топ 10 самых часто встречающихся в новостях слов длиннее 6 символов для каждого файла.
+#
+# Не забываем про декомпозицию и организацию кода в функции. В решении домашнего задания вам могут помочь: split(), sort или sorted.
 
 import json
+# from pprint import pprint
+
+def max_value_of_keys(dict):
+    # функция для поиска ключа с максимальным значением
+    index = 0
+    key_ = None
+    for key in dict.keys():
+        if index < dict[key]:
+            index = dict[key]
+            key_ = key
+            continue
+    return key_
+
+if __name__ == '__main__':
+    pass
+
+lst_news = list()
+
+with open('newsafr.json') as data:
+    dfile = json.load(data)
+    for dict in dfile['rss']['channel']['items']:
+        lst_news.extend(dict['description'].lower().split())
+        # title тоже включаем, т.к. заголовок новости тоже является частью новости и попадает под условия ДЗ
+        lst_news.extend(dict['title'].lower().split())
+
+num = 0
+dict = {}
+for word in lst_news:
+    if len(word) > 6:
+        num = lst_news.count(word)
+        dict.update({word: num})
+
+lst_top = []
+lst_top_num = []
+# списки. не стал использовать словарь, т.к. словарь неупорядочен в отличии от списков.
+index = 0
+while index < 10:
+    key = max_value_of_keys(dict)
+    lst_top.append(key)
+    lst_top_num.append(dict.pop(key))
+    index += 1
+
+print('(json)ТОП-10 самых популярных слов в новостях:')
+for index, top in enumerate(zip(lst_top, lst_top_num)):
+    print(f'{" " * 3}{index+1}. {top[0]} - {top[1]} шт.')
 
 
-def read_files(name='newsafr.json'):
-    if name == 'newsafr.json':
-        with open(name, encoding='utf-8') as datafile:
-            json_data = json.load(datafile)   # распаковка в виде словаря
-            description_text = ''
-            for items in json_data['rss']['channel']['items']:
-                description_text += ' ' + items['description']
-        return description_text
-    elif name == 'newsafr.xml':
-        import xml.etree.ElementTree as ET
-        tree = ET.parse("newsafr.xml")  # Открываем дерево
-        root = tree.getroot()  # Получаем корень дерева
-        xml_items = root.findall("./channel/item/description")
-        description_text = ''
-        for items in xml_items:
-            description_text = description_text + items.text
-        return description_text
+# Написать программу, которая будет выводить топ 10 самых часто встречающихся в новостях слов длиннее 6 символов для каждого файла.
+#
+# Не забываем про декомпозицию и организацию кода в функции. В решении домашнего задания вам могут помочь: split(), sort или sorted.
 
+import xml.etree.ElementTree as ETXML
+# from pprint import pprint
 
-def count_word(description_text):
-    # функция подсчета слов длиннее 6 символов
-    # возвращаем словарь {слово:количество}
-    list_split = description_text.split(' ')
-    dict_word_value = {}
-    for word in list_split:
-        if len(word) > 6:
-            if word in dict_word_value:
-                dict_word_value[word] += 1
-            else:
-                dict_word_value[word] = 1
-    return dict_word_value
+def max_value_of_keys(dict):
+    # функция для поиска ключа с максимальным значением
+    index = 0
+    key_ = None
+    for key in dict.keys():
+        if index < dict[key]:
+            index = dict[key]
+            key_ = key
+            continue
+    return key_
 
+if __name__ == '__main__':
+    pass
 
-def sort_top(dict_word_value):
-    # функция сортировки и вывода ТОП-10
-    # делаем сортировку с реверсом по ключам, получаем список [количество, слово]
-    lambda_key = lambda dict_word_value: (dict_word_value[1], dict_word_value[1])
-    sort_list = sorted(dict_word_value.items(), key=lambda_key, reverse=True)
-    count = 1
-    # делаем словарь с нумерацией
-    dict_top_10 = {}
-    for word in sort_list:
-        dict_top_10[count] = word
-        count += 1
-        if count == 10:
-            break
-    # получили отсортированный словарь ТОП-10 {номер: (количеств, слово)}
-    for top_10 in dict_top_10.values():
-        print('  ', top_10[1], ': ', top_10[0])
+lst_news = list()
 
-    return dict_top_10
+with open('newsafr.xml') as data:
+    dfile = ETXML.parse(data).getroot()
+    description = dfile.findall("channel/item/description")
+    for dscrpt in description:
+        lst_news.extend(dscrpt.text.lower().split())
+    title = dfile.findall("channel/item/title")
+    # title тоже включаем, т.к. заголовок новости тоже является частью новости и попадает под условия ДЗ
+    for ttl in title:
+        lst_news.extend(ttl.text.lower().split())
 
+num = 0
+dict = {}
+for word in lst_news:
+    if len(word) > 6:
+        num = lst_news.count(word)
+        dict.update({word: num})
 
-def main_menu():
-    while True:
-        name = input('\nВведите имя файла ( newsafr.json или  newsafr.xml ). Выход - q: ')
-        if name == 'newsafr.json' or name == 'newsafr.xml':
-            print('\nТоп 10 самых часто встречающихся в новостях слов длиннее 6 символов:')
-            sort_top(count_word(read_files(name)))
-        elif name == 'q':
-            break
-        else:
-            print('Некорректный ввод, повторите.')
+lst_top = []
+lst_top_num = []
+# списки. не стал использовать словарь, т.к. словарь неупорядочен в отличии от списков.
+index = 0
+while index < 10:
+    key = max_value_of_keys(dict)
+    lst_top.append(key)
+    lst_top_num.append(dict.pop(key))
+    index += 1
 
-
-main_menu()
+print('(xml)ТОП-10 самых популярных слов в новостях: ')
+for index, top in enumerate(zip(lst_top, lst_top_num)):
+    print(f'{" " * 3}{index+1}. {top[0]} - {top[1]} шт.')
