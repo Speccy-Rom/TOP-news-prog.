@@ -16,10 +16,7 @@ def max_value_of_keys(dict):
             continue
     return key_
 
-if __name__ == '__main__':
-    pass
-
-lst_news = list()
+lst_news = []
 
 with open('newsafr.json') as data:
     dfile = json.load(data)
@@ -33,18 +30,14 @@ dict = {}
 for word in lst_news:
     if len(word) > 6:
         num = lst_news.count(word)
-        dict.update({word: num})
+        dict[word] = num
 
 lst_top = []
 lst_top_num = []
-# списки. не стал использовать словарь, т.к. словарь неупорядочен в отличии от списков.
-index = 0
-while index < 10:
+for _ in range(10):
     key = max_value_of_keys(dict)
     lst_top.append(key)
     lst_top_num.append(dict.pop(key))
-    index += 1
-
 print('(json)ТОП-10 самых популярных слов в новостях:')
 for index, top in enumerate(zip(lst_top, lst_top_num)):
     print(f'{" " * 3}{index+1}. {top[0]} - {top[1]} шт.')
@@ -68,10 +61,7 @@ def max_value_of_keys(dict):
             continue
     return key_
 
-if __name__ == '__main__':
-    pass
-
-lst_news = list()
+lst_news = []
 
 with open('newsafr.xml') as data:
     dfile = ETXML.parse(data).getroot()
@@ -88,18 +78,14 @@ dict = {}
 for word in lst_news:
     if len(word) > 6:
         num = lst_news.count(word)
-        dict.update({word: num})
+        dict[word] = num
 
 lst_top = []
 lst_top_num = []
-# списки. не стал использовать словарь, т.к. словарь неупорядочен в отличии от списков.
-index = 0
-while index < 10:
+for _ in range(10):
     key = max_value_of_keys(dict)
     lst_top.append(key)
     lst_top_num.append(dict.pop(key))
-    index += 1
-
 print('(xml)ТОП-10 самых популярных слов в новостях: ')
 for index, top in enumerate(zip(lst_top, lst_top_num)):
     print(f'{" " * 3}{index+1}. {top[0]} - {top[1]} шт.')
